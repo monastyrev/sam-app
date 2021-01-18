@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-app
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  EventQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: EVENTS
+  EventQueueConsumerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist
+      Handler: consumers/EventQueueConsumer.handler
+      Runtime: nodejs12.x
+      Policies:
+        - AmazonDynamoDBFullAccess
+      Events:
+        MachineQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EventQueue.Arn
+            BatchSize: 10
+  GetAllCarsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello-world/dist
+      Handler: handlers/GetAllCarsHandler.handler
+      Runtime: nodejs12.x
+      Policies:
+        - AmazonDynamoDBFullAccess
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+  GetCarByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist
+      Handler: handlers/GetCarByIdHandler.handler
+      Runtime: nodejs12.x
+      Policies:
+        - AmazonDynamoDBFullAccess
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /{id}
+            Method: get
+  GetAllCarNotificationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello-world/dist
+      Handler: handlers/GetAllCarNotificationsHandler.handler
+      Runtime: nodejs12.x
+      Policies:
+        - AmazonDynamoDBFullAccess
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /{id}/notifications
+            Method: get
+  CarsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: CARS
+      PrimaryKey:
+        Name: id
+        Type: String
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  CarApi:
+    Description: "API Gateway endpoint URL for Prod stage for cars"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

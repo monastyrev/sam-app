@@ -1,0 +1,24 @@
+{
+  "name": "cars_api",
+  "version": "1.0.0",
+  "main": "app.js",
+  "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
+  "author": "SAM CLI",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1"
+  },
+  "scripts": {
+    "compile": "tsc",
+    "test": "mocha tests/unit/",
+    "integ-test": "mocha tests/integration/"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.70",
+    "@types/node": "^14.14.20",
+    "aws-sdk": "^2.827.0",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "typescript": "^3.8.3"
+  }
+}
